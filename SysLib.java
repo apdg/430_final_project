@@ -3,9 +3,9 @@ import java.util.*;
 public class SysLib {
 
     // our file system calls
-    public static int open( String s ) {
+    public static int open( String filename, String mode ){
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.OPEN, 2, s );
+                 Kernel.OPEN, 0, filename, mode );
     }
 
     public static int close( int fd ) {
@@ -18,9 +18,9 @@ public class SysLib {
                  Kernel.SIZE, fd, null );
     }
 
-    public static int seek( String s ) {
+    public static int delete( String filename ) {
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.SEEK, 3, s );
+                 Kernel.DELETE, 0, filename );
     }
 
     public static int format( int files ) {
@@ -28,9 +28,9 @@ public class SysLib {
                  Kernel.FORMAT, files, null );
     }
 
-    public static int delete( String fileName ) {
+    public static int seek( FileTableEntry ftEnt, int offset, int whence ){
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.DELETE, 0, args );
+                 Kernel.SEEK, whence, ftEnt, offset );
     }
     // end of our calls
 
