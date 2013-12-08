@@ -22,20 +22,34 @@ public class Directory {
 	// initializes the Directory instance with this data[]
 	public int bytes2directory( byte data[] ) {
 		int offset = 0;
-		for ( int i = 0; i < fsizes.length; i++, offset += 4 )
+		for ( int i = 0; i < fsizes.length; i++, offset += 4 ) {
 			fsizes[i] = SysLib.bytes2int( data, offset );
-		for ( int i = 0; i < fnames.length; i++, offset += maxChars * 2 ) {
+        } 
+        for ( int i = 0; i < fnames.length; i++, offset += maxChars * 2 ) {
 			String fname = new String( data, offset, maxChars * 2 );
 			fname.getChars( 0, fsizes[i], fnames[i], 0 );
 		}
 
 	}
 
+    // Converts the Directory information into a plain byte array and returns it.
+    // This byte array will then be written back to disk.
 	public byte[] directory2bytes( ) {
-	// converts and return Directory information into a plain byte array
-	// this byte array will be written back to disk
-	// note: only meaningfull directory information should be converted
-	// into bytes.
+        int byte_array_size = fsize.length * 4 +
+                              fnames.length * maxChars * 2;
+        byte data[byte_array_size];
+        int offset = 0;
+        // add fsize
+        for (int i = 0; i < fsizes.length; i++, offset += 4) {
+            SysLib.int2bytes(fsizes[i], data, offset);
+        }
+        // add fnames
+        for (int i = 0; i < fnames.length, i++, offset += maxChars * 2) {
+            for (int j = 0; j < fsizes[i]; j++) {
+                short2bytes((short)fnames[i][j], data, offset + j);
+            }
+        }
+        return data;
 	}
 
 	public short ialloc( String filename ) {
