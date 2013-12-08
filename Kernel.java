@@ -50,6 +50,9 @@ public class Kernel
     private static Disk disk;
     private static Cache cache;
 
+    //Filesystem
+    private static FileSystem filesystem;
+
     // Synchronized Queues
     private static SyncQueue waitQueue;  // for threads to wait for their child
     private static SyncQueue ioQueue;    // I/O queue
@@ -166,28 +169,37 @@ public class Kernel
 		    break;
 		}
 		return OK;
-	    case CREAD:   // to be implemented in assignment 4
+
+		// assignment 4 related switches
+	    case CREAD:
 		return cache.read( param, ( byte[] )args ) ? OK : ERROR;
-	    case CWRITE:  // to be implemented in assignment 4
+	    case CWRITE: 
 		return cache.write( param, ( byte[] )args ) ? OK : ERROR;
-	    case CSYNC:   // to be implemented in assignment 4
+	    case CSYNC:
 		cache.sync( );
 		return OK;
-	    case CFLUSH:  // to be implemented in assignment 4
+	    case CFLUSH:
 		cache.flush( );
 		return OK;
-	    case OPEN:    // to be implemented in project
-		return OK;
-	    case CLOSE:   // to be implemented in project
-		return OK;
-	    case SIZE:    // to be implemented in project
-		return OK;
-	    case SEEK:    // to be implemented in project
-		return OK;
-	    case FORMAT:  // to be implemented in project
-		return OK;
-	    case DELETE:  // to be implemented in project
-		return OK;
+
+		// project related switches
+	    case OPEN:  // not done
+	    return filesystem.open(  ) ? OK : ERROR;
+
+	    case CLOSE:
+	    return filesystem.close( param ) ? OK : ERROR;
+
+	    case SIZE:
+	    return filesystem.fsize( param ) ? OK : ERROR;
+
+	    case SEEK:  // not done
+	    return filesystem.seek(  ) ? OK : ERROR;
+
+	    case FORMAT:
+	    return filesystem.format( param ) ? OK : ERROR;
+
+	    case DELETE:
+	    return filesystem.delete( (String)args ) ? OK : ERROR;
 	    }
 	    return ERROR;
 	case INTERRUPT_DISK: // Disk interrupts

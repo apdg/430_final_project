@@ -1,9 +1,42 @@
 import java.util.*;
 
 public class SysLib {
+
+    // our file system calls
+    public static int open( String s ) {
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+                 Kernel.OPEN, 2, s );
+    }
+
+    public static int close( int fd ) {
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+                 Kernel.CLOSE, fd, null );
+    }
+
+    public static int size( int fd ) {
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+                 Kernel.SIZE, fd, null );
+    }
+
+    public static int seek( String s ) {
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+                 Kernel.SEEK, 3, s );
+    }
+
+    public static int format( int files ) {
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+                 Kernel.FORMAT, files, null );
+    }
+
+    public static int delete( String fileName ) {
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+                 Kernel.DELETE, 0, args );
+    }
+    // end of our calls
+
     public static int exec( String args[] ) {
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-				 Kernel.EXEC, 0, args );
+                Kernel.EXEC, 0, args );
     }
 
     public static int join( ) {
