@@ -20,12 +20,22 @@ public class Inode {
 		indirect = -1;
 	}
 
-	Inode( short iNumber ) {                       // another constructor
-		// **TODO**
-	}
-
-	Inode( short iNumber ) {                       // retrieving inode from disk
-	 	// **TODO**
+	Inode ( short iNumber ) {
+		int blkNumber = iNumber / 16 + 1;
+		byte[] data = new byte[Disk.blockSize];
+		SysLib.rawread( blkNumber, data );
+		int offset = ( iNumber % 16 ) * iNodeSize;
+		length = SysLib.bytes2int( data, offset );
+		offset += 4;
+		count = SysLib.bytes2short( data, offset );
+		offset += 2;
+		flag = SysLib.bytes2short( data, offset );
+		offset += 2;
+		for ( int i = 0; i < directSize; i++ ) {
+			direct[i] = SysLib.bytes2short( data, offset );
+			offset += 2;
+		}
+		indirect = SysLib.bytes2short( data, offset );
 	}
 
 	int toDisk( short iNumber ) {                  // save to disk as the i-th inode

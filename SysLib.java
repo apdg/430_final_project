@@ -3,29 +3,32 @@ import java.util.*;
 public class SysLib {
 
     // our file system calls
-    public static int open( String filename, String mode ){
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.OPEN, 0, filename, mode );
+    // public static int open( String filename, String mode ){
+    //     return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
+    //              Kernel.OPEN, 0, filename, mode );
+    // }
+
+    public static int open( String filename, String mode ) {
+        String[] args = new String[2];
+        args[0] = filename;
+        args[1] = mode;
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.OPEN, 0, args );
     }
 
     public static int close( int fd ) {
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.CLOSE, fd, null );
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.CLOSE, fd, null );
     }
 
     public static int size( int fd ) {
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.SIZE, fd, null );
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.SIZE, fd, null );
     }
 
     public static int delete( String filename ) {
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.DELETE, 0, filename );
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.DELETE, 0, filename );
     }
 
     public static int format( int files ) {
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.FORMAT, files, null );
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, files, null );
     }
 
     public static int seek( FileTableEntry ftEnt, int offset, int whence ){
