@@ -28,9 +28,9 @@ public class FileSystem {
 		// **TODO**
 	}
 	
-	FileTableEntry open( String filename, String mode ){
-		// **TODO**
-	}
+	// FileTableEntry open( String filename, String mode ){
+	// 	// **TODO**
+	// }
 	
 	FileTableEntry open( String filename, String mode ) {
 		FileTableEntry ftEnt = filetable.falloc( filename, mode );

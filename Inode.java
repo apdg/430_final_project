@@ -42,4 +42,25 @@ public class Inode {
 	 	// **TODO**
 	}
 
+	// these sigs were in the slides but I'm not sure what they're for
+	int findIndexBlock(){
+
+	}
+
+	boolean registerIndexBlock( short indexBlockNumber ){
+
+	}
+
+	int findTargetBlock( int offset ){
+
+	}
+
+	int registerTargetBlock( int offset, short targetBlockNumber ){
+
+	}
+
+	byte[] unregisterIndexBlock(){
+
+	}
+
 }
