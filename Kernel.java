@@ -183,8 +183,18 @@ public class Kernel
 		return OK;
 
 		// project related switches
-	    case OPEN:
-	    return filesystem.open( args[0], args[1] ) ? OK : ERROR;
+	    // case OPEN:
+	    // return filesystem.open( args[0], args[1] ) ? OK : ERROR;
+
+		case OPEN:
+		if ( ( myTcb = scheduler.getMyTcb() ) == null )
+			return ERROR;
+		else {
+			String[] s = (String[]) args;
+			FileTableEntry ftEnt = fs.open( s[0], s[1] );
+			int fd = myTcb.getFd( ftEnt );
+			return fd;
+		}
 
 	    case CLOSE:
 	    return filesystem.close( param ) ? OK : ERROR;

@@ -32,6 +32,15 @@ public class FileSystem {
 		// **TODO**
 	}
 	
+	FileTableEntry open( String filename, String mode ) {
+		FileTableEntry ftEnt = filetable.falloc( filename, mode );
+		if ( mode == "w" ){             // release all blocks belonging to this file
+			if ( deallocAllBlocks( ftEnt ) == false )
+				return null;
+		}
+		return ftEnt;
+	}
+
 	boolean close( FileTableEntry ftEnt ){
 		// **TODO**
 	}
