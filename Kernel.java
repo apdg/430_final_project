@@ -183,8 +183,8 @@ public class Kernel
 		return OK;
 
 		// project related switches
-	    case OPEN:  // not done
-	    return filesystem.open(  ) ? OK : ERROR;
+	    case OPEN:
+	    return filesystem.open( args[0], args[1] ) ? OK : ERROR;
 
 	    case CLOSE:
 	    return filesystem.close( param ) ? OK : ERROR;
@@ -192,8 +192,8 @@ public class Kernel
 	    case SIZE:
 	    return filesystem.fsize( param ) ? OK : ERROR;
 
-	    case SEEK:  // not done
-	    return filesystem.seek(  ) ? OK : ERROR;
+	    case SEEK:
+	    return filesystem.seek( args[0], args[1], param ) ? OK : ERROR;
 
 	    case FORMAT:
 	    return filesystem.format( param ) ? OK : ERROR;
