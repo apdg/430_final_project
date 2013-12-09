@@ -52,18 +52,40 @@ public class Directory {
         return data;
 	}
 
+    
 	public short ialloc( String filename ) {
 	// filename is the one of a file to be created.
 	// allocates a new inode number for this filename
+        short iNumber = 0;
+        for (int i = 0; i < fsizes.length; i++) {
+            if (fsizes[i] == 0) {
+                iNumber = i;
+                break;
+            }
+        }
+
+        fsizes[iNumber] = filename.size();
+        filename.getChars(0, fsizes[iNumber], fnames[iNumber], 0);
+
+        return num_inodes;
 	}
 
 	public boolean ifree( short iNumber ) {
 	// deallocates this inumber (inode number)
 	// the corresponding file will be deleted.
+        fsizes[iNumber] = 0;
+        return true;
 	}
 
 	public short namei( String filename ) {
 	// returns the inumber corresponding to this filename
-	}
+	    short iNumber;
+        for (int i = 0; i < fnames.length; i++, iNumber++) {
+            String compname = new String(fnames[i], 0, fsizes[i]);
+            if (compname.compareTo(filename) == 0) {
+                return iNumber;
+            }
+        }
+    }
 
 }
