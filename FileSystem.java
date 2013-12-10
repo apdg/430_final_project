@@ -25,6 +25,8 @@ public class FileSystem {
 	}
 	
 	boolean format( int files ){
+		superblock.format( files );
+		filetable = new FileTable( directory );
 		// **TODO**
 	}
 	
