@@ -42,33 +42,49 @@ public class SuperBlock {
 		// **TODO**
 		// initialize Inodes, free blocks
         inodeBlocks = defaultInodeBlocks;
-        freeBlocks = totalBlocks - inodeBlocks - 2; // superblock and directoryblock
+        initFreeList();
     }
 	
 	void format( int numBlocks ){
 		// **TODO**
 		// initialize Inodes, free blocks
-        inodeBlocks = numBlocks;
-        freeBlocks = totalBlocks - inodeBlocks - 2; // superblock and directoryblock
-	}
+        inodeBlocks = defaultInodeBlocks; // = numBlocks ???
+        initFreeList();
+    }
 
 	public int getFreeBlock(){
 		// **TODO**
 		// dequeue top block in freelist
-        int free = freeBlocks;
-        byte[] data = SysLib.rawread(free, freeBlocks);
-        short next = bytes2short(data, 0);
+        int free_block_num = freeList;
+        byte[] buffer = new byte[Disk.blockSize];
+        SysLib.rawread(free_block_num, buffer);
+        int next = bytes2int(buffer, 0);
         freeBlocks = next;
-        return free;
+        return free_block_num;
 	}
 
+    // Takes the current pointer of freeList and sets it as the pointer of the
+    // block "oldBlockNumber".  
+    // 
+    // freeList is then set to point to oldBlockNumber.
 	public boolean returnBlock( int oldBlockNumber ){
 		// **TODO**
 		// enqueue oldBlockNumber to top of freelist
-        byte[] freeBlock = new byte[Disk.blockSize];
-        int next = freeBlocks;
-        SysLib.int2bytes(next, freeBlock, 0);
-        SysLib.rawwrite(oldBlockNumber, freeBlock);
+        byte[] buffer = new byte[Disk.blockSize];
+        int next = freeList;
+        SysLib.int2bytes(next, buffer, 0);
+        SysLib.rawwrite(oldBlockNumber, buffer);
         freeBlocks = oldBlockNumber;
 	}
+
+    void initFreeList() {
+        // because returnBlock() adds the given block to the front/top of the
+        // list, we need to add them in reverse order.  
+        freeList = -1;
+        int freeListEnd = totalBlocks - 1;
+        int freeListStart = ((inodeBlocks * 32) / Disk.blockSize) + 1;
+        for (int i = freeListEnd; i > freeListStart; i++) {
+            returnBlock(i);
+        }
+    }
 }
