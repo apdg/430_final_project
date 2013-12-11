@@ -199,7 +199,7 @@ public class Kernel
 	    case CLOSE:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
 			FileTableEntry ftEnt = myTcb.getFtEnt( param );
-			if ( ftEnt == null || filesystem.close( ftEnt ) == false ) {
+			if ( ftEnt == null || filesystem.close( ftEnt ) == false )
 				return -1;
 			if (myTcb.returnFd( param ) != ftEnt )
 				return -1;
@@ -230,12 +230,12 @@ public class Kernel
 
 	    //return filesystem.format( param ) ? OK : ERROR;
 	    return 0;
-		}
+		//}
 
 	    case DELETE:
 	    //return filesystem.delete( (String)args ) ? OK : ERROR;
 	    return 0;
-	    }
+	    //}
 	    return ERROR;
 	case INTERRUPT_DISK: // Disk interrupts
 	    // wake up the thread waiting for a service completion
@@ -249,6 +249,7 @@ public class Kernel
 	    return OK;
 	}
 	return OK;
+    }
     }
 
     // Spawning a new thread

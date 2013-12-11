@@ -64,7 +64,7 @@ public class FileSystem {
 			return fte;
 		}
 		else
-			return -1;
+			return null;
 
 		/*
 		FileTableEntry ftEnt = filetable.falloc( filename, mode );
