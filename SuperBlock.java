@@ -46,19 +46,20 @@ public class SuperBlock {
     }
 	
 	void format( int numBlocks ){
-		if (numBlocks <= 0) {
-			numBlocks = 1;
-		}
-		// **TODO**
-		// initialize Inodes, free blocks
-        inodeBlocks = numBlocks; // = numBlocks ???
+	
+		if (numBlocks <= 0 || numBlocks >= totalBlocks) {
+			inodeBlocks = 1; // need at least one...
+		} else {
+        	inodeBlocks = numBlocks; 
+        }
+        
         initFreeList();
         sync();
     }
 
 	public int getFreeBlock(){
 		// Check if there are any blocks left to acquire.
-		if (freeList < 0 || freeList <  || freeList >= totalBlocks || ) {
+		if (freeList < 0 || freeList >= totalBlocks) {
 			return -1;  // Failed to grab a free block.
 		}
 		
