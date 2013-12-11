@@ -45,6 +45,7 @@ public class FileTable {
 		}
 	}
 
+
 	public synchronized boolean ffree( FileTableEntry fte ) {
 		// receive a file table entry reference
 		// save the corresponding inode to the disk
@@ -53,6 +54,7 @@ public class FileTable {
 		fte.inode.toDisk(fte.iNumber);
 		boolean succeeded = table.remove(fte);
 		return succeeded;
+
 	}
 
 	public synchronized boolean fempty( ) {

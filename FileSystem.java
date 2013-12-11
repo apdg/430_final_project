@@ -58,8 +58,21 @@ public class FileSystem {
 	
 	
 	public FileTableEntry open( String filename, String mode ) {
-		FileTableEntry fte = filetable.falloc(filename, mode);
-		return fte;
+		// Check if mode is valid: == "r" or "w" or "w+" or "a"
+		if ( mode.equals("r") || mode.equals("w") || mode.equals("w+") || mode.equals("a")) {
+			FileTableEntry fte = filetable.falloc(filename, mode);
+			return fte;
+		}
+		else
+			return -1;
+
+		/*
+		FileTableEntry ftEnt = filetable.falloc( filename, mode );
+		if ( mode == "w" ){			 // release all blocks belonging to this file
+			if ( deallocAllBlocks( ftEnt ) == false )
+				return null;
+		}
+		return ftEnt;*/
 	}
 
 

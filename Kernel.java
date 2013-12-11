@@ -197,7 +197,14 @@ public class Kernel
 		}
 
 	    case CLOSE:
-	    return filesystem.close( param ) ? OK : ERROR;
+	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
+			FileTableEntry ftEnt = myTcb.getMyTcb( param );
+			if ( ftEnt == null || filesystem.close( ftEnt ) == false ) {
+				return -1;
+			if (myTcb.returnFd( param ) != ftEnt )
+				return -1;
+			return 0;
+		}
 
 	    case SIZE:
 	    return filesystem.fsize( param ) ? OK : ERROR;
