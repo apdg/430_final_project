@@ -55,6 +55,7 @@ public class FileSystem {
 	public FileTableEntry open( String filename, String mode ) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 		// Check if mode is valid: == "r" or "w" or "w+" or "a"
 		if ( mode.equals("r") || mode.equals("w") || mode.equals("w+") || mode.equals("a")) {
 			FileTableEntry fte = filetable.falloc(filename, mode);
@@ -70,6 +71,10 @@ public class FileSystem {
 				return null;
 		}
 		return ftEnt;*/
+=======
+		FileTableEntry fte = filetable.falloc(filename, mode);
+		return fte;
+>>>>>>> b11714d15f1f36344e311c8d18487420064f6f3c
 =======
 		FileTableEntry fte = filetable.falloc(filename, mode);
 		return fte;
