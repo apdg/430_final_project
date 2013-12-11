@@ -38,8 +38,7 @@ public class Inode {
 		indirect = SysLib.bytes2short( data, offset );
 	}
 
-	int toDisk( short iNumber ) {                  // save to disk as the i-th inode
-	 	// **TODO**
+	int toDisk( short iNumber ) { 
 	 	
 	 	// Read the corresponding block into byte buffer
 	 	byte[] buffer = new byte[Disk.blockSize];
@@ -65,6 +64,7 @@ public class Inode {
 	}
 
 
+	// We have no idea what this function is intended to do...
 	int findIndexBlock(){
 		if (length/Disk.blockSize < directSize && indirect > 0){
 			

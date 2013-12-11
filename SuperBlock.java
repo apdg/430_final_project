@@ -80,7 +80,7 @@ public class SuperBlock {
     // block "oldBlockNumber".  
     // 
     // freeList is then set to point to oldBlockNumber.
-	public boolean returnBlock( int oldBlockNumber ){
+	public boolean returnBlock( int oldBlockNumber ) {
 	
 		// This *shouldn't* happen, but just in case...
 		if (oldBlockNumber >= totalBlocks || oldBlockNumber < 0) {

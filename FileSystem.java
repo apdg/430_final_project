@@ -59,22 +59,45 @@ public class FileSystem {
 	
 	public FileTableEntry open( String filename, String mode ) {
 		// Check if mode is valid: == "r" or "w" or "w+" or "a"
+		FileTableEntry fte;
 		if ( mode.equals("r") || mode.equals("w") || mode.equals("w+") || mode.equals("a")) {
-			FileTableEntry fte = filetable.falloc(filename, mode);
-			return fte;
-		}
-		else
-			return null;
+			fte = filetable.falloc(filename, mode);
+			//return fte;
+		} else {
+			fte = null;
+		}	
 
-		/*
-		FileTableEntry ftEnt = filetable.falloc( filename, mode );
-		if ( mode == "w" ){			 // release all blocks belonging to this file
-			if ( deallocAllBlocks( ftEnt ) == false )
+		
+		if ( mode == "w" ) {			 // release all blocks belonging to this file
+			if ( deallocAllBlocks( fte ) == false ) {
 				return null;
+			}
 		}
-		return ftEnt;*/
+		return fte;
 	}
 
+	private boolean deallocAllBlocks(FileTableEntry fte) {
+		if (fte == null) {
+			return false;
+		}
+		
+		int filesize = fte.inode.length;
+		for (int i = 0; i < filesize; i += 512) {
+			int targetblock = fte.inode.findTargetBlock(i);
+			superblock.returnBlock(targetblock);
+		}
+		
+		if (fte.inode.indirect != 0) {
+			superblock.returnBlock(fte.inode.indirect);
+			fte.inode.indirect = 0;
+		}
+		
+		fte.inode.length = 0; 
+		
+		fte.inode.toDisk(fte.iNumber); // Write the iNode back to disk.
+		
+		return true;
+	}
 
 	// 
 	public boolean close( FileTableEntry ftEnt ){
@@ -85,9 +108,16 @@ public class FileSystem {
 		
 		ftEnt.count--;
 		if (ftEnt.count == 0) {
-			ftEnt.inode.toDisk(ftEnt.iNumber);
+
 			ftEnt.inode.count--;
+			// If the inode has been marked as deleted (3) and the last thread
+			// to be accessing it has closed it, delete it instead. 
+			if (ftEnt.inode.flag == 3 && ftEnt.inode.count == 0) {
+				deallocAllBlocks(ftEnt);
+				directory.ifree(ftEnt.iNumber);
+			}
 			filetable.ffree(ftEnt);
+			ftEnt.inode.toDisk(ftEnt.iNumber);
 		}
 		return true;
 	}
@@ -246,16 +276,8 @@ public class FileSystem {
 
 	// 
 	public boolean delete( String filename ){
-		// **TODO**
-		// Remove the entry in Directory
-		// Add all allocated blocks back to the freelist
-		// 
-		// Release Indirect Blocks
-		// Release Indirect Index Block
-		// Release Direct Blocks
-		// Remove Directory Entry
-		// Zero Inode
-		// 
+
+
 		int inumber = directory.namei(filename);
 		
 		// We don't want to delete the root file, and we don't want to try to 
@@ -265,30 +287,35 @@ public class FileSystem {
 		}
 		
 		Inode inode = directory.inodei(inumber);
-		int length = inode.length;
-		int num_blocks = length / Disk.blockSize;
-		for (int i = 0; i < num_blocks && i < 11; i++) {
-			superblock.returnBlock(inode.direct[i]);
+		
+		if (inode.count > 0) {
+			inode.flag = 3; // delete flag.
+			// will be deleted when the current thread closes the file.
+			return true;
 		}
 		
-		if (num_blocks >= 11) {
-			num_blocks -= 11;
-			byte[] buffer = new byte[Disk.blockSize];
-			SysLib.rawread((int)inode.indirect, buffer);
-			for (int i = 0; i < 256; i++) {
-				short block = SysLib.bytes2short(buffer, i * 2);
-				if (block == -1) {
-					break;
-				} else {
-					superblock.returnBlock((int)block);
-				}
-			}
-			superblock.returnBlock((int)inode.indirect);
+		
+		// This section is identical to deallocAllBlocks();
+		int filesize = inode.length;
+		for (int i = 0; i < filesize; i += 512) {
+			int targetblock = inode.findTargetBlock(i);
+			superblock.returnBlock(targetblock);
 		}
 		
-		directory.ifree((short)inumber);
+		if (inode.indirect != 0) {
+			superblock.returnBlock(inode.indirect);
+			inode.indirect = 0;
+		}
+		
+		inode.length = 0; 
+		
+		directory.ifree((short)inumber);  // Remove the directory entry.
+		
+		inode.toDisk((short)inumber); // Write the iNode back to disk.
+		
 		
 		return true;
+		
 	}
 	
 
