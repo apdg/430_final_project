@@ -80,11 +80,14 @@ public class Kernel
 		disk.start( );
 
 		// instantiate a cache memory
-		cache = new Cache( disk.blockSize, 10 );
+		cache = new Cache( Disk.blockSize, 10 );
 
 		// instantiate synchronized queues
 		ioQueue = new SyncQueue( );
 		waitQueue = new SyncQueue( scheduler.getMaxThreads( ) );
+		
+		filesystem = new FileSystem(1000);
+		
 		return OK;
 	    case EXEC:
 		return sysExec( ( String[] )args );
@@ -209,7 +212,7 @@ public class Kernel
 	    case SIZE:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
 			FileTableEntry ftEnt = myTcb.getFtEnt( param );
-			if ( ftEnt != null && filesystem.fsize( ftEnt ) == true )
+			if ( ftEnt != null && filesystem.fsize( ftEnt ) <= 0 )
 				return 0;
 		}
 		return -1;
@@ -217,7 +220,10 @@ public class Kernel
 	
 	    case SEEK:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-	    	FileTableEntry ftEnt = filesystem.seek( args.get(0), args.get(1), args.get(2) );
+	    	FileTableEntry ftEnt = (FileTableEntry)((Vector)args).elementAt(0);
+	    	int offset = ((Integer)((Vector)args).elementAt(1)).intValue();
+	    	int whence = ((Integer)((Vector)args).elementAt(2)).intValue();
+	    	int output = filesystem.seek( ftEnt, offset, whence);
 	    	if ( ftEnt == null ) {
 	    		return -1;
 	    	}
@@ -225,6 +231,7 @@ public class Kernel
 	    }
 
 	    case FORMAT:
+    	SysLib.cout("filesystem.format\n");
 	    return filesystem.format( param ) ? OK : ERROR;
 
 	    case DELETE:

@@ -49,7 +49,9 @@ public class FileSystem {
 		// filetable = new FileTable(directory);
 		// Write Directory to Disk
 		// Write Inode for file "/" to Disk.
+		SysLib.cout("superblock formatting\n");
 		superblock.format( files );
+		SysLib.cout("superblock formatted\n");
 		directory = new Directory( files );
 		filetable = new FileTable( directory );
 		sync();

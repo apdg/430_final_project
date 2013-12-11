@@ -41,8 +41,10 @@ public class SuperBlock {
 	void format(){
 		// **TODO**
 		// initialize Inodes, free blocks
+		SysLib.cerr("Still Formatting\n");
         inodeBlocks = defaultInodeBlocks;
         initFreeList();
+		SysLib.cerr("Still Formatting...\n");
         sync();
     }
 	
@@ -86,8 +88,8 @@ public class SuperBlock {
         freeList = -1;
         int freeListEnd = totalBlocks - 1;
         int freeListStart = ((inodeBlocks * 32) / Disk.blockSize) + 1;
-        for (int i = freeListEnd; i > freeListStart; i++) {
-            returnBlock(i);
+        for (int i = freeListEnd; i > freeListStart; i--) {
+      	    returnBlock(i);
         }
     }
 }
