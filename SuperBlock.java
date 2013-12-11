@@ -48,7 +48,7 @@ public class SuperBlock {
 	void format( int numBlocks ){
 		// **TODO**
 		// initialize Inodes, free blocks
-        inodeBlocks = defaultInodeBlocks; // = numBlocks ???
+        inodeBlocks = numBlocks; // = numBlocks ???
         initFreeList();
     }
 

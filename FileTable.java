@@ -46,6 +46,10 @@ public class FileTable {
         // save the corresponding inode to the disk
         // free this file table entry.
         // return true if this file table entry found in my table
+
+		// decrement inode use count 
+        // write inode to disk if count is zero 
+        // delete file table entry
 	}
 
 	public synchronized boolean fempty( ) {

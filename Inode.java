@@ -40,7 +40,29 @@ public class Inode {
 
 	int toDisk( short iNumber ) {                  // save to disk as the i-th inode
 	 	// **TODO**
+	 	
+	 	// Read the corresponding block into byte buffer
+	 	byte[] buffer = new byte[Disk.blockSize];
+	 	// Calculate the offset within the buffer
+	 	int blockNumber = iNumber / 16 + 1;
+	 	SysLib.rawread(blockNumber, buffer);
+	 	int offset = (iNumber % 16) * iNodeSize;
+	 	
+	 	SysLib.int2bytes(length, buffer, offset);
+	 	offset += 4;
+	 	SysLib.short2bytes(count, buffer, offset);
+	 	offset += 2;
+	 	SysLib.short2bytes(flag, buffer, offset);
+	 	offset += 2;
+	 	for (int i = 0; i < directSize; i++) {
+	 		SysLib.short2bytes(direct[i], buffer, offset);
+	 		offset += 2;
+	 	}
+	 	SysLib.short2bytes(indirect, buffer, offset);
+	 	
+	 	SysLib.rawwrite(blockNumber, buffer);
 	}
+
 
 	int findIndexBlock(){
 		if (length/Disk.blockSize < directSize && indirect > 0){
@@ -50,31 +72,61 @@ public class Inode {
 
 	}
 
-	boolean registerIndexBlock( short indexBlockNumber ){
 
+	boolean registerIndexBlock( short indexBlockNumber ) {
+		indirect = indexBlockNumber;
+		byte[] buffer = new byte[Disk.blockSize];
+		for (int i = 0; i < Disk.blockSize; i *= 2) {
+			SysLib.short2bytes(-1, buffer, i);
+		}
+		SysLib.rawwrite(indirect, buffer);
 	}
 
-	int findTargetBlock( int offset ){
+
+	int findTargetBlock( int offset ) {
 		int blockNumber = offset/Disk.blockSize;
 		if (blockNumber < 0 ) 
-			return -;
+			return -1;
 		else if ( blockNumber < directSize )
 			return direct[blockNumber];
 		else if ( blockNumber < 267 && indirect == 1 ) {
 			// ok so I need to come back with one of the indirect blocks, how?
-
+			// Get the block of other pointers
+			int block_index = (int)indirect;
+			byte[] indirect_buf = new byte[Disk.blockSize];
+			Sys.rawread(block_index, indirect_buf);
+			
+			// Subtract 11 so we can get get the appropriate bytes within the
+			// indirect block.
+			block_index = blockNumber - directSize;
+			block_index = (int)SysLib.byte2short(indirect_buf, block_index * 2);
 		}
 		else
 			return -1;
 
 	}
 
-	int registerTargetBlock( int offset, short targetBlockNumber ){
 
+	int registerTargetBlock( int offset, short targetBlockNumber ){
+		int blkNumber = offset / Disk.blockSize;
+		if (blkNumber => 11) {
+			blkNumber -= 11;
+			byte[] buffer = new byte[Disk.blockSize];
+			SysLib.rawread(indirect, buffer);
+			
+			int offset = blkNumber * 2;
+			SysLib.short2bytes(targetBlockNumber, buffer, offset);
+			SysLib.rawwrite(indirect, buffer);
+		} else {
+			direct[blkNumber] = targetBlockNumber;
+		} 
 	}
 
-	byte[] unregisterIndexBlock(){
 
+	byte[] unregisterIndexBlock(){
+		byte[] buffer = new byte[Disk.blockSize];
+		SysLib.rawread(indirect, buffer);
+		return buffer;
 	}
 
 }
