@@ -50,9 +50,6 @@ public class Kernel
     private static Disk disk;
     private static Cache cache;
 
-    //Filesystem
-    private static FileSystem filesystem;
-
     // Synchronized Queues
     private static SyncQueue waitQueue;  // for threads to wait for their child
     private static SyncQueue ioQueue;    // I/O queue
@@ -169,67 +166,29 @@ public class Kernel
 		    break;
 		}
 		return OK;
-
-		// assignment 4 related switches
-	    case CREAD:
+	    case CREAD:   // to be implemented in assignment 4
 		return cache.read( param, ( byte[] )args ) ? OK : ERROR;
-	    case CWRITE: 
+	    case CWRITE:  // to be implemented in assignment 4
 		return cache.write( param, ( byte[] )args ) ? OK : ERROR;
-	    case CSYNC:
+	    case CSYNC:   // to be implemented in assignment 4
 		cache.sync( );
 		return OK;
-	    case CFLUSH:
+	    case CFLUSH:  // to be implemented in assignment 4
 		cache.flush( );
 		return OK;
-
-		// project related switches
-	    // case OPEN:
-	    // return filesystem.open( args[0], args[1] ) ? OK : ERROR;
-
-		case OPEN:
-		if ( ( myTcb = scheduler.getMyTcb() ) == null )
-			return ERROR;
-		else {
-			String[] s = (String[]) args;
-			FileTableEntry ftEnt = filesystem.open( s[0], s[1] );
-			int fd = myTcb.getFd( ftEnt );
-			return fd;
-		}
-
-	    case CLOSE:
-	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-			FileTableEntry ftEnt = myTcb.getFtEnt( param );
-			if ( ftEnt == null || filesystem.close( ftEnt ) == false )
-				return -1;
-			if (myTcb.returnFd( param ) != ftEnt )
-				return -1;
-			return 0;
-		}
-
-	    case SIZE:
-	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-			FileTableEntry ftEnt = myTcb.getFtEnt( param );
-			if ( ftEnt != null && filesystem.fsize( ftEnt ) == true )
-				return 0;
-		}
-		return -1;
-	//good
-	
-	    case SEEK:
-	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-	    	FileTableEntry ftEnt = filesystem.seek( args.get(0), args.get(1), args.get(2) );
-	    	if ( ftEnt == null ) {
-	    		return -1;
-	    	}
-	    	return 0;
+	    case OPEN:    // to be implemented in project
+		return OK;
+	    case CLOSE:   // to be implemented in project
+		return OK;
+	    case SIZE:    // to be implemented in project
+		return OK;
+	    case SEEK:    // to be implemented in project
+		return OK;
+	    case FORMAT:  // to be implemented in project
+		return OK;
+	    case DELETE:  // to be implemented in project
+		return OK;
 	    }
-
-	    case FORMAT:
-	    return filesystem.format( param ) ? OK : ERROR;
-
-	    case DELETE:
-	    return filesystem.delete( (String)args ) ? OK : ERROR;
-}
 	    return ERROR;
 	case INTERRUPT_DISK: // Disk interrupts
 	    // wake up the thread waiting for a service completion
