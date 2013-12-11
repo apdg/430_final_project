@@ -191,14 +191,14 @@ public class Kernel
 			return ERROR;
 		else {
 			String[] s = (String[]) args;
-			FileTableEntry ftEnt = fs.open( s[0], s[1] );
+			FileTableEntry ftEnt = filesystem.open( s[0], s[1] );
 			int fd = myTcb.getFd( ftEnt );
 			return fd;
 		}
 
 	    case CLOSE:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-			FileTableEntry ftEnt = myTcb.getMyTcb( param );
+			FileTableEntry ftEnt = myTcb.getFtEnt( param );
 			if ( ftEnt == null || filesystem.close( ftEnt ) == false ) {
 				return -1;
 			if (myTcb.returnFd( param ) != ftEnt )
@@ -207,16 +207,34 @@ public class Kernel
 		}
 
 	    case SIZE:
-	    return filesystem.fsize( param ) ? OK : ERROR;
-
+	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
+			FileTableEntry ftEnt = myTcb.getFtEnt( param );
+			if ( ftEnt != null && filesystem.fsize( ftEnt ) == true )
+				return 0;
+		}
+		return -1;
+	//good
+	
 	    case SEEK:
-	    return filesystem.seek( args[0], args[1], param ) ? OK : ERROR;
+	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
+	    	FileTableEntry ftEnt = filesystem.seek( args[0], args[1], param );
+	    	if ( ftEnt == null ) {
+	    		return -1;
+	    	}
+	    	return 0;
+	    }
 
 	    case FORMAT:
-	    return filesystem.format( param ) ? OK : ERROR;
+	    //if ( ( myTcb = scheduler.getMyTcb() ) != null ){
+		//	FileTableEntry ftEnt = myTcb.getFtEnt( param );
+
+	    //return filesystem.format( param ) ? OK : ERROR;
+	    return 0;
+		}
 
 	    case DELETE:
-	    return filesystem.delete( (String)args ) ? OK : ERROR;
+	    //return filesystem.delete( (String)args ) ? OK : ERROR;
+	    return 0;
 	    }
 	    return ERROR;
 	case INTERRUPT_DISK: // Disk interrupts
