@@ -57,12 +57,20 @@ public class Inode {
 	int findTargetBlock( int offset ){
 		int blockNumber = offset/Disk.blockSize;
 		if (blockNumber < 0 ) 
-			return -;
+			return -1;
 		else if ( blockNumber < directSize )
 			return direct[blockNumber];
 		else if ( blockNumber < 267 && indirect == 1 ) {
 			// ok so I need to come back with one of the indirect blocks, how?
-
+			// Get the block of other pointers
+			int block_index = (int)indirect;
+			byte[] indirect_buf = new byte[Disk.blockSize];
+			Sys.rawread(block_index, indirect_buf);
+			
+			// Subtract 11 so we can get get the appropriate bytes within the
+			// indirect block.
+			block_index = blockNumber - directSize;
+			block_index = (int)SysLib.byte2short(indirect_buf, block_index * 2);
 		}
 		else
 			return -1;

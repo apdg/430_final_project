@@ -39,30 +39,22 @@ public class FileSystem {
 	 * @param int files the maximum number of files to create.
 	 */
 	public boolean format( int files ){
+		// **TODO**
 		// Do we just want to call sync() here?  I feel like they will be largely
 		// the same.
 
 		// SuperBlock.format()
+		// filetable = new FileTable(directory);
 		// Write Directory to Disk
 		// Write Inode for file "/" to Disk.
 		superblock.format( files );
 		filetable = new FileTable( directory );
-		// **TODO**
 	}
 	
 	
 	public FileTableEntry open( String filename, String mode ) {
-		// Check if mode is valid: == "r" or "w" or "w+" or "a"
 		FileTableEntry fte = filetable.falloc(filename, mode);
 		return fte;
-
-		/*
-		FileTableEntry ftEnt = filetable.falloc( filename, mode );
-		if ( mode == "w" ){			 // release all blocks belonging to this file
-			if ( deallocAllBlocks( ftEnt ) == false )
-				return null;
-		}
-		return ftEnt;*/
 	}
 
 
@@ -82,9 +74,27 @@ public class FileSystem {
 	}
 	
 
-	public int read( FileTableEntry ftEnt, byte[] buffer ){
+	public int read( FileTableEntry ftEnt, byte[] buffer ) {
 		// **TODO**
 		// read in the appropriate 
+		int offset = seekPtr;
+		int block = ftEnt.inode.findTargetBlock(offset);
+		byte[] block_buffer = new byte[Disk.blockSize];
+		SysLib.rawread(block, block_buffer);
+		
+		int buffer_index = 0;
+		
+		while (offset < ftEnt.inode.length && buffer_index < buffer.length) {
+			if (offset % Disk.blockSize == 0) {
+				block = ftEnt.inode.findTargetBlock(offset);
+				SysLib.rawread(block, block_buffer);
+			}
+			
+			buffer[buffer_index] = block_buffer[offset];
+			
+			offset++;
+			buffer_index++;
+		}
 	}
 	
 
