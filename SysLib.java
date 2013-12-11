@@ -30,7 +30,12 @@ public class SysLib {
     public static int format( int files ) {
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, files, null );
     }
-
+    public static int read( int fd, byte buffer[] ){
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, fd, buffer );
+    }
+    public static int write( int fd, byte buffer[] ){
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, fd, buffer );
+    }
     public static int seek( FileTableEntry ftEnt, int offset, int whence ){
         Vector args = new Vector();
         args.add(ftEnt);        

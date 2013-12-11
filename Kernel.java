@@ -153,6 +153,10 @@ public class Kernel
 		case STDERR:
 		    System.out.println( "threaOS: caused read errors" );
 		    return ERROR;
+		default:
+			if ( ( myTcb = scheduler.getMyTcb() ) == null )
+				return -1;
+			return filesystem.read( param, (buffer[])args );
 		}
 		// return FileSystem.read( param, byte args[] );
 		return ERROR;
@@ -167,6 +171,10 @@ public class Kernel
 		case STDERR:
 		    System.err.print( (String)args );
 		    break;
+		default:
+			if ( ( myTcb = scheduler.getMyTcb() ) == null )
+				return -1;
+			return filesystem.write( param, (buffer[])args );
 		}
 		return OK;
 
