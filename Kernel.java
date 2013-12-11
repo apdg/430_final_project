@@ -159,7 +159,7 @@ public class Kernel
 		default:
 			if ( ( myTcb = scheduler.getMyTcb() ) == null )
 				return -1;
-			return filesystem.read( param, (buffer[])args );
+			return filesystem.read( param, (byte[])args );
 		}
 		// return FileSystem.read( param, byte args[] );
 		return ERROR;
@@ -177,7 +177,7 @@ public class Kernel
 		default:
 			if ( ( myTcb = scheduler.getMyTcb() ) == null )
 				return -1;
-			return filesystem.write( param, (buffer[])args );
+			return filesystem.write( param, (byte[])args );
 		}
 		return OK;
 
