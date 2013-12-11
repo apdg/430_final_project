@@ -57,31 +57,38 @@ public class SuperBlock {
     }
 
 	public int getFreeBlock(){
-		// **TODO**
-		// dequeue top block in freelist
+		// Check if there are any blocks left to acquire.
+		if (freeList < 0 || freeList <  || freeList >= totalBlocks || ) {
+			return -1;  // Failed to grab a free block.
+		}
+		
+		// We want to grab the next block and read the beginning of the buffer
+		// to get the next block number.  If successful, we return the number of
+		// the current block, and set the FreeList to be the value pulled from
+		// the block.
         int free_block_num = freeList;
         byte[] buffer = new byte[Disk.blockSize];
-        if (free_block_num == -1 || free_block_num >= 1000) {
-        	System.out.printf("freeblocknum: %d\n", free_block_num);
-        	return -1;
-        }
         SysLib.rawread(free_block_num, buffer);
         int next = SysLib.bytes2int(buffer, 0);
-        if (next >= 1000) {
-        	System.out.printf("next: %d\n", next);
-        	return -1;
-        }
         freeList = next;
         return free_block_num;
 	}
+
 
     // Takes the current pointer of freeList and sets it as the pointer of the
     // block "oldBlockNumber".  
     // 
     // freeList is then set to point to oldBlockNumber.
 	public boolean returnBlock( int oldBlockNumber ){
-		// **TODO**
-		// enqueue oldBlockNumber to top of freelist
+	
+		// This *shouldn't* happen, but just in case...
+		if (oldBlockNumber >= totalBlocks || oldBlockNumber < 0) {
+			return false;
+		}
+		
+		// Create a new buffer, write the freelist value to the start of the 
+		// buffer, and then write the buffer to the oldBlock.  Set FreeList to
+		// now point at the oldBlock.
         byte[] buffer = new byte[Disk.blockSize];
         int next = freeList;
         SysLib.int2bytes(next, buffer, 0);
@@ -96,6 +103,9 @@ public class SuperBlock {
         freeList = -1;
         int freeListEnd = totalBlocks - 1;
         int freeListStart = ((inodeBlocks * 32) / Disk.blockSize) + 1;
+        if ((inodeBlocks * 32 ) % Disk.blockSize != 0) {
+        	freeListStart += 1;
+        }
         for (int i = freeListEnd; i > freeListStart; i--) {
       	    returnBlock(i);
         }
