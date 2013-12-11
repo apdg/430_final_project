@@ -115,26 +115,16 @@ public class FileSystem {
 	
 
 	int seek( FileTableEntry ftEnt, int offset, int whence ){
-<<<<<<< HEAD
-		if ( offset < 0 )
-			offset = 0;
 		if (whence = 0) 
 			ftEnt.seekPtr = offset;
 		else
 			ftEnt.seekPtr += offset;
-		if ( offset > ftEntry.inode.length )
+
+		if ( offset > ftEntry.inode.length)
 			offset = ftEntry.inode.length;
+		else if (ftEnt.seekPtr < 0 ) 
+			ftEnt.seekPtr = 0;
+
 		return 1;
 	}
 }
-=======
-		// **TODO**
-		// udpate the seek pointer in ftEnt
-		// Be sure to clamp to 0.
-	}
-
-}
-<<<<<<< HEAD
->>>>>>> 3241a6aa8685575a6410ce5c0db8e1292e152ce2
-=======
->>>>>>> 3241a6aa8685575a6410ce5c0db8e1292e152ce2
