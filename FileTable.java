@@ -17,7 +17,28 @@ public class FileTable {
         // increment this inode's count
         // immediately write back this inode to the disk
         // return a reference to this file (structure) table entry
-
+        FileTableEntry fte;
+		int inode_index = directory.iname(filename);
+		if (inode_index == -1) {
+		
+			if (mode.compareTo("r")) {
+				return null;
+			}
+			
+			inode_index = directory.ialloc(filename);
+			//Inode inode = new Inode();
+			//indoe.toDisk(inode_index);
+			Inode inode = dir.inodei(inode_index);
+			fte = new FileTableEntry(inode, inode_index, mode);
+			
+			return fte;
+			
+		} else {
+			//Inode inode = new Inode(inode_index);
+			Inode inode = dir.inodei(inode_index);
+			fte = new FileTableEntry(inode, inode_index, mode);
+			return fte;
+		}
 	}
 
 	public synchronized boolean ffree( FileTableEntry e ) {

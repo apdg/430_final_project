@@ -7,9 +7,12 @@ public class Directory {
 	// Directory entries
 	private int fsize[];        // each element stores a different file size.
 	private char fnames[][];    // each element stores a different file name.
+	
+	private Inode inodes[];		// 
 
 	public Directory( int maxInumber ) { // directory constructor
-	fsize = new int[maxInumber];     // maxInumber = max files
+		fsize = new int[maxInumber];     // maxInumber = max files
+		inodes = new Inode[maxInumber];
 		for ( int i = 0; i < maxInumber; i++ ) 
 			fsize[i] = 0;                 // all file size initialized to 0
 		fnames = new char[maxInumber][maxChars];
@@ -98,6 +101,14 @@ public class Directory {
             }
         }
         return iNumber;
+    }
+    
+    // Returns a reference to an in-memory Inode at the given index.
+    public Inode inodei( int iNumber ) {
+    	if (inodes[iNumber] == null) {
+    		inodes[iNumber] = new Inode(iNumber);
+    	}
+    	return inodes[iNumber];
     }
 
 
