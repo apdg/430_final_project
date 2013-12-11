@@ -30,17 +30,26 @@ public class SysLib {
     public static int format( int files ) {
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, files, null );
     }
-    public static int read( int fd, byte buffer[] ){
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, fd, buffer );
+    public static int read( int fd, byte buffer[] ) {
+    	/*FileTableEntry fte = scheduler.getMyTcb().returnFd(fd);
+    	Vector args = new Vector();
+    	args.add(fte);
+    	args.add(buffer);*/
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.READ, fd, buffer );
     }
-    public static int write( int fd, byte buffer[] ){
-        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.FORMAT, fd, buffer );
+    public static int write( int fd, byte buffer[] ) {
+
+        return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE, Kernel.WRITE, fd, buffer );
     }
-    public static int seek( FileTableEntry ftEnt, int offset, int whence ){
-        Vector args = new Vector();
+    public static int seek( int fd, int offset, int whence ){
+        /*Vector args = new Vector();
         args.add(ftEnt);        
         args.add(new Integer(offset));
-        args.add(new Integer(whence));
+        args.add(new Integer(whence));*/
+        int args[] = new int[3];
+        args[0] = fd;
+        args[1] = offset;
+        args[2] = whence;
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
                  Kernel.SEEK, 0, args );
     }

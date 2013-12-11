@@ -159,10 +159,10 @@ public class Kernel
 		default:
 			if ( ( myTcb = scheduler.getMyTcb() ) == null )
 				return -1;
-			return filesystem.read( param, (byte[])args );
+			return filesystem.read( myTcb.returnFd(param), (byte[])args );
 		}
 		// return FileSystem.read( param, byte args[] );
-		return ERROR;
+		//return ERROR;
 	    case WRITE:
 		switch ( param ) {
 		case STDIN:
@@ -177,7 +177,7 @@ public class Kernel
 		default:
 			if ( ( myTcb = scheduler.getMyTcb() ) == null )
 				return -1;
-			return filesystem.write( param, (byte[])args );
+			return filesystem.write( myTcb.returnFd(param), (byte[])args );
 		}
 		return OK;
 
@@ -228,9 +228,13 @@ public class Kernel
 	
 	    case SEEK:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
+	    	/*
 	    	FileTableEntry ftEnt = (FileTableEntry)((Vector)args).elementAt(0);
 	    	int offset = ((Integer)((Vector)args).elementAt(1)).intValue();
-	    	int whence = ((Integer)((Vector)args).elementAt(2)).intValue();
+	    	int whence = ((Integer)((Vector)args).elementAt(2)).intValue();*/
+	    	FileTableEntry ftEnt = myTcb.returnFd(((int[])args)[0]);
+	    	int offset = ((int[])args)[1];
+	    	int whence = ((int[])args)[2];
 	    	int output = filesystem.seek( ftEnt, offset, whence);
 	    	if ( ftEnt == null ) {
 	    		return -1;

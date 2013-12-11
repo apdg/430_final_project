@@ -22,7 +22,6 @@ public class SuperBlock {
 
 		else {
 			totalBlocks = diskSize;
-			SysLib.cerr( "Formatting\n" );
 			format();
 		}
 	}
@@ -41,14 +40,15 @@ public class SuperBlock {
 	void format(){
 		// **TODO**
 		// initialize Inodes, free blocks
-		SysLib.cerr("Still Formatting\n");
         inodeBlocks = defaultInodeBlocks;
         initFreeList();
-		SysLib.cerr("Still Formatting...\n");
         sync();
     }
 	
 	void format( int numBlocks ){
+		if (numBlocks <= 0) {
+			numBlocks = 1;
+		}
 		// **TODO**
 		// initialize Inodes, free blocks
         inodeBlocks = numBlocks; // = numBlocks ???
@@ -61,8 +61,16 @@ public class SuperBlock {
 		// dequeue top block in freelist
         int free_block_num = freeList;
         byte[] buffer = new byte[Disk.blockSize];
+        if (free_block_num == -1 || free_block_num >= 1000) {
+        	System.out.printf("freeblocknum: %d\n", free_block_num);
+        	return -1;
+        }
         SysLib.rawread(free_block_num, buffer);
         int next = SysLib.bytes2int(buffer, 0);
+        if (next >= 1000) {
+        	System.out.printf("next: %d\n", next);
+        	return -1;
+        }
         freeList = next;
         return free_block_num;
 	}

@@ -115,6 +115,10 @@ public class Inode {
 		if (blkNumber >= 11) {
 			blkNumber -= 11;
 			byte[] buffer = new byte[Disk.blockSize];
+			if (indirect < 0 || indirect >= 1000) {
+				System.out.printf("indirect: %d\n", indirect);
+				return -1;
+			}
 			SysLib.rawread(indirect, buffer);
 			
 			int entry_offset = blkNumber * 2;

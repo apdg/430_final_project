@@ -11,6 +11,7 @@ public class Directory {
 	private Inode inodes[];		// 
 
 	public Directory( int maxInumber ) { // directory constructor
+		//System.out.printf("maxInumber: %d\n", maxInumber);
 		fsize = new int[maxInumber];     // maxInumber = max files
 		inodes = new Inode[maxInumber];
 		for ( int i = 0; i < maxInumber; i++ ) 
