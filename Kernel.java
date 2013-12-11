@@ -199,7 +199,7 @@ public class Kernel
 	    case CLOSE:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
 			FileTableEntry ftEnt = myTcb.getFtEnt( param );
-			if ( ftEnt == null || filesystem.close( ftEnt ) == false ) {
+			if ( ftEnt == null || filesystem.close( ftEnt ) == false )
 				return -1;
 			if (myTcb.returnFd( param ) != ftEnt )
 				return -1;
@@ -217,7 +217,7 @@ public class Kernel
 	
 	    case SEEK:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-	    	FileTableEntry ftEnt = filesystem.seek( args[0], args[1], param );
+	    	FileTableEntry ftEnt = filesystem.seek( args[0], args[1], args[2] );
 	    	if ( ftEnt == null ) {
 	    		return -1;
 	    	}

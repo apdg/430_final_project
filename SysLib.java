@@ -32,8 +32,12 @@ public class SysLib {
     }
 
     public static int seek( FileTableEntry ftEnt, int offset, int whence ){
+        Vector args = new Vector<Object>;
+        args.add(ftEnt);        
+        args.add(new Integer(offset));
+        args.add(new Integer(whence));
         return Kernel.interrupt( Kernel.INTERRUPT_SOFTWARE,
-                 Kernel.SEEK, whence, ftEnt, offset );
+                 Kernel.SEEK, 0, args );
     }
     // end of our calls
 
