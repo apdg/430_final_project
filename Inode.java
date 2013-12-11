@@ -42,8 +42,11 @@ public class Inode {
 	 	// **TODO**
 	}
 
-	// these sigs were in the slides but I'm not sure what they're for
 	int findIndexBlock(){
+		if (length/Disk.blockSize < directSize && indirect > 0){
+			
+		}
+		return -1;
 
 	}
 
@@ -52,6 +55,17 @@ public class Inode {
 	}
 
 	int findTargetBlock( int offset ){
+		int blockNumber = offset/Disk.blockSize;
+		if (blockNumber < 0 ) 
+			return -;
+		else if ( blockNumber < directSize )
+			return direct[blockNumber];
+		else if ( blockNumber < 267 && indirect == 1 ) {
+			// ok so I need to come back with one of the indirect blocks, how?
+
+		}
+		else
+			return -1;
 
 	}
 
