@@ -106,7 +106,7 @@ public class Directory {
     // Returns a reference to an in-memory Inode at the given index.
     public Inode inodei( int iNumber ) {
     	if (inodes[iNumber] == null) {
-    		inodes[iNumber] = new Inode(iNumber);
+    		inodes[iNumber] = new Inode((short)iNumber);
     	}
     	return inodes[iNumber];
     }

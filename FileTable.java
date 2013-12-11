@@ -1,4 +1,5 @@
 // FileTable.java
+import java.util.*;
 
 public class FileTable {
 
@@ -12,40 +13,46 @@ public class FileTable {
 
 	// major public methods
 	public synchronized FileTableEntry falloc( String filename, String mode ) {
-        // allocate a new file (structure) table entry for this file name
-        // allocate/retrieve and register the corresponding inode using dir
-        // increment this inode's count
-        // immediately write back this inode to the disk
-        // return a reference to this file (structure) table entry
+		// allocate a new file (structure) table entry for this file name
+		// allocate/retrieve and register the corresponding inode using dir
+		// increment this inode's count
+		// immediately write back this inode to the disk
+		// return a reference to this file (structure) table entry
         FileTableEntry fte;
-		int inode_index = directory.iname(filename);
+		int inode_index = dir.namei(filename);
 		if (inode_index == -1) {
 		
-			if (mode.compareTo("r")) {
+			if (mode.equals("r")) {
 				return null;
 			}
 			
-			inode_index = directory.ialloc(filename);
+			inode_index = dir.ialloc(filename);
 			//Inode inode = new Inode();
 			//indoe.toDisk(inode_index);
 			Inode inode = dir.inodei(inode_index);
-			fte = new FileTableEntry(inode, inode_index, mode);
+			fte = new FileTableEntry(inode, (short)inode_index, mode);
+			table.add(fte);
 			
 			return fte;
 			
 		} else {
 			//Inode inode = new Inode(inode_index);
 			Inode inode = dir.inodei(inode_index);
-			fte = new FileTableEntry(inode, inode_index, mode);
+			fte = new FileTableEntry(inode, (short)inode_index, mode);
+			table.add(fte);
+			
 			return fte;
 		}
 	}
 
-	public synchronized boolean ffree( FileTableEntry e ) {
-        // receive a file table entry reference
-        // save the corresponding inode to the disk
-        // free this file table entry.
-        // return true if this file table entry found in my table
+	public synchronized boolean ffree( FileTableEntry fte ) {
+		// receive a file table entry reference
+		// save the corresponding inode to the disk
+		// free this file table entry.
+		// return true if this file table entry found in my table
+		fte.inode.toDisk(fte.iNumber);
+		boolean succeeded = table.remove(fte);
+		return succeeded;
 	}
 
 	public synchronized boolean fempty( ) {

@@ -61,6 +61,7 @@ public class Inode {
 	 	SysLib.short2bytes(indirect, buffer, offset);
 	 	
 	 	SysLib.rawwrite(blockNumber, buffer);
+	 	return 0;
 	}
 
 
@@ -77,9 +78,10 @@ public class Inode {
 		indirect = indexBlockNumber;
 		byte[] buffer = new byte[Disk.blockSize];
 		for (int i = 0; i < Disk.blockSize; i *= 2) {
-			SysLib.short2bytes(-1, buffer, i);
+			SysLib.short2bytes((short)-1, buffer, i);
 		}
 		SysLib.rawwrite(indirect, buffer);
+		return true;
 	}
 
 
@@ -94,12 +96,13 @@ public class Inode {
 			// Get the block of other pointers
 			int block_index = (int)indirect;
 			byte[] indirect_buf = new byte[Disk.blockSize];
-			Sys.rawread(block_index, indirect_buf);
+			SysLib.rawread(block_index, indirect_buf);
 			
 			// Subtract 11 so we can get get the appropriate bytes within the
 			// indirect block.
 			block_index = blockNumber - directSize;
-			block_index = (int)SysLib.byte2short(indirect_buf, block_index * 2);
+			block_index = (int)SysLib.bytes2short(indirect_buf, block_index * 2);
+			return block_index;
 		}
 		else
 			return -1;
@@ -109,17 +112,18 @@ public class Inode {
 
 	int registerTargetBlock( int offset, short targetBlockNumber ){
 		int blkNumber = offset / Disk.blockSize;
-		if (blkNumber => 11) {
+		if (blkNumber >= 11) {
 			blkNumber -= 11;
 			byte[] buffer = new byte[Disk.blockSize];
 			SysLib.rawread(indirect, buffer);
 			
-			int offset = blkNumber * 2;
-			SysLib.short2bytes(targetBlockNumber, buffer, offset);
+			int entry_offset = blkNumber * 2;
+			SysLib.short2bytes(targetBlockNumber, buffer, entry_offset);
 			SysLib.rawwrite(indirect, buffer);
 		} else {
 			direct[blkNumber] = targetBlockNumber;
 		} 
+		return 0;
 	}
 
 

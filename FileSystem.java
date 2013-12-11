@@ -11,11 +11,13 @@ public class FileSystem {
 		directory = new Directory( superblock.inodeBlocks );
 		filetable = new FileTable( directory );
 		FileTableEntry dirEnt = open( "/", "r" );
-		int dirSize = fsize( dirEnt );
+		int dirSize = fsize( dirEnt ); // will be 0 when the Disk is first initialized.
 		if ( dirSize > 0 ) {
 			byte[] dirData = new byte[dirSize];
 			read( dirEnt, dirData );
 			directory.bytes2directory( dirData );
+		} else {
+			sync(); // this will write the directory to Disk and update the root inode.
 		}
 		close( dirEnt );
 	}
@@ -27,11 +29,11 @@ public class FileSystem {
 		// **TODO**
 		// Write each of the necessary blocks to Disk:
 		superblock.sync();
-		directory.sync();
-		
-			// SuperBlock
-			// Directory Block
-			// INode Blocks???
+		byte[] buffer = directory.directory2bytes();
+		FileTableEntry dirEnt = open("/", "w");
+		write(dirEnt, buffer);
+		close(dirEnt);
+
 	}
 	
 	/**
@@ -48,7 +50,10 @@ public class FileSystem {
 		// Write Directory to Disk
 		// Write Inode for file "/" to Disk.
 		superblock.format( files );
+		directory = new Directory( files );
 		filetable = new FileTable( directory );
+		sync();
+		return true;
 	}
 	
 	
@@ -65,6 +70,13 @@ public class FileSystem {
 		// Write changes to Disk:
 			// Inode
 			// Directory
+		ftEnt.count--;
+		if (ftEnt.count == 0) {
+			ftEnt.inode.toDisk(ftEnt.iNumber);
+			ftEnt.inode.count--;
+			filetable.ffree(ftEnt);
+		}
+		return true;
 	}
 	
 
@@ -95,6 +107,7 @@ public class FileSystem {
 			offset++;
 			buffer_index++;
 		}
+		return 0;
 	}
 	
 
@@ -104,9 +117,12 @@ public class FileSystem {
 		// Write the contents of buffer to the file specified by ftEnt
 		// 
 		// Check write permissions.
+		if (ftEnt.mode.equals("r")) {
+			return -1;
+		}
 		
 		int offset = ftEnt.seekPtr;
-		int block;
+		int block = -1;
 		byte[] block_buffer = new byte[Disk.blockSize];
 		
 		// Want to read in the first block only if we actually have a file...
@@ -120,21 +136,30 @@ public class FileSystem {
 		while (buffer_index < buffer.length) {
 
 			if (offset % Disk.blockSize == 0) {
+				if (offset > 0) {
+					// Write the previous block back to Disk, but only if we had
+					// a previous block.
+					SysLib.rawwrite(block, block_buffer);
+				}
 				if (offset >= ftEnt.inode.length) {
 					// grab a new block from freelist
-					// "read" that block into the buffer
-					int 
+					block = superblock.getFreeBlock();
+					ftEnt.inode.registerTargetBlock(offset, (short)block);
+					SysLib.rawread(block, block_buffer);
+				} else {
+					block = ftEnt.inode.findTargetBlock(offset);
+					SysLib.rawread(block, block_buffer); 
 				}
-				// get next block number 
-				// read in that block to buffer
 			}
 			
-			block_buffer[offset % Disk.blockSize] = block[buffer_index];
+			block_buffer[offset % Disk.blockSize] = buffer[buffer_index];
 			
 			offset++;
 			buffer_index++;
 		}
-		
+		ftEnt.inode.length = offset;
+		ftEnt.inode.toDisk(ftEnt.iNumber);
+		return 1; // or whatever success was....
 		// Update inodes
 	}
 	
@@ -144,17 +169,18 @@ public class FileSystem {
 		// Remove the entry in Directory
 		// Add all allocated blocks back to the freelist
 		// 
+		return true;
 	}
 	
 
 	int seek( FileTableEntry ftEnt, int offset, int whence ){
-		if (whence = 0) 
+		if (whence == 0) 
 			ftEnt.seekPtr = offset;
 		else
 			ftEnt.seekPtr += offset;
 
-		if ( offset > ftEntry.inode.length)
-			offset = ftEntry.inode.length;
+		if ( offset > ftEnt.inode.length)
+			offset = ftEnt.inode.length;
 		else if (ftEnt.seekPtr < 0 ) 
 			ftEnt.seekPtr = 0;
 

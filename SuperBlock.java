@@ -43,6 +43,7 @@ public class SuperBlock {
 		// initialize Inodes, free blocks
         inodeBlocks = defaultInodeBlocks;
         initFreeList();
+        sync();
     }
 	
 	void format( int numBlocks ){
@@ -50,6 +51,7 @@ public class SuperBlock {
 		// initialize Inodes, free blocks
         inodeBlocks = numBlocks; // = numBlocks ???
         initFreeList();
+        sync();
     }
 
 	public int getFreeBlock(){
@@ -58,8 +60,8 @@ public class SuperBlock {
         int free_block_num = freeList;
         byte[] buffer = new byte[Disk.blockSize];
         SysLib.rawread(free_block_num, buffer);
-        int next = bytes2int(buffer, 0);
-        freeBlocks = next;
+        int next = SysLib.bytes2int(buffer, 0);
+        freeList = next;
         return free_block_num;
 	}
 
@@ -74,7 +76,8 @@ public class SuperBlock {
         int next = freeList;
         SysLib.int2bytes(next, buffer, 0);
         SysLib.rawwrite(oldBlockNumber, buffer);
-        freeBlocks = oldBlockNumber;
+        freeList = oldBlockNumber;
+        return true;
 	}
 
     void initFreeList() {
