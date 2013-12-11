@@ -39,22 +39,29 @@ public class FileSystem {
 	 * @param int files the maximum number of files to create.
 	 */
 	public boolean format( int files ){
+		// **TODO**
 		// Do we just want to call sync() here?  I feel like they will be largely
 		// the same.
 
 		// SuperBlock.format()
+		// filetable = new FileTable(directory);
 		// Write Directory to Disk
 		// Write Inode for file "/" to Disk.
 		superblock.format( files );
 		filetable = new FileTable( directory );
-		// **TODO**
 	}
 	
 	
 	public FileTableEntry open( String filename, String mode ) {
+<<<<<<< HEAD
+<<<<<<< HEAD
 		// Check if mode is valid: == "r" or "w" or "w+" or "a"
-		FileTableEntry fte = filetable.falloc(filename, mode);
-		return fte;
+		if ( mode.equals("r") || mode.equals("w") || mode.equals("w+") || mode.equals("a")) {
+			FileTableEntry fte = filetable.falloc(filename, mode);
+			return fte;
+		}
+		else
+			return -1;
 
 		/*
 		FileTableEntry ftEnt = filetable.falloc( filename, mode );
@@ -63,6 +70,14 @@ public class FileSystem {
 				return null;
 		}
 		return ftEnt;*/
+=======
+		FileTableEntry fte = filetable.falloc(filename, mode);
+		return fte;
+>>>>>>> b11714d15f1f36344e311c8d18487420064f6f3c
+=======
+		FileTableEntry fte = filetable.falloc(filename, mode);
+		return fte;
+>>>>>>> b11714d15f1f36344e311c8d18487420064f6f3c
 	}
 
 
@@ -82,9 +97,27 @@ public class FileSystem {
 	}
 	
 
-	public int read( FileTableEntry ftEnt, byte[] buffer ){
+	public int read( FileTableEntry ftEnt, byte[] buffer ) {
 		// **TODO**
 		// read in the appropriate 
+		int offset = ftEnt.seekPtr;
+		int block = ftEnt.inode.findTargetBlock(offset);
+		byte[] block_buffer = new byte[Disk.blockSize];
+		SysLib.rawread(block, block_buffer);
+		
+		int buffer_index = 0;
+		
+		while (offset < ftEnt.inode.length && buffer_index < buffer.length) {
+			if (offset % Disk.blockSize == 0) {  // Possible Source of OBOB!!!!
+				block = ftEnt.inode.findTargetBlock(offset);
+				SysLib.rawread(block, block_buffer);
+			}
+			
+			buffer[buffer_index] = block_buffer[offset % Disk.blockSize];
+			
+			offset++;
+			buffer_index++;
+		}
 	}
 	
 
@@ -93,6 +126,39 @@ public class FileSystem {
 		// Read in the appropriate blocks
 		// Write the contents of buffer to the file specified by ftEnt
 		// 
+		// Check write permissions.
+		
+		int offset = ftEnt.seekPtr;
+		int block;
+		byte[] block_buffer = new byte[Disk.blockSize];
+		
+		// Want to read in the first block only if we actually have a file...
+		if (ftEnt.inode.length > 0) {
+			block = ftEnt.inode.findTargetBlock(offset);
+			SysLib.rawread(block, block_buffer);
+		}
+		
+		int buffer_index = 0;
+		
+		while (buffer_index < buffer.length) {
+
+			if (offset % Disk.blockSize == 0) {
+				if (offset >= ftEnt.inode.length) {
+					// grab a new block from freelist
+					// "read" that block into the buffer
+					int 
+				}
+				// get next block number 
+				// read in that block to buffer
+			}
+			
+			block_buffer[offset % Disk.blockSize] = block[buffer_index];
+			
+			offset++;
+			buffer_index++;
+		}
+		
+		// Update inodes
 	}
 	
 
