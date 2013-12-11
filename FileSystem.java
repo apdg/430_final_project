@@ -77,7 +77,7 @@ public class FileSystem {
 	public int read( FileTableEntry ftEnt, byte[] buffer ) {
 		// **TODO**
 		// read in the appropriate 
-		int offset = seekPtr;
+		int offset = ftEnt.seekPtr;
 		int block = ftEnt.inode.findTargetBlock(offset);
 		byte[] block_buffer = new byte[Disk.blockSize];
 		SysLib.rawread(block, block_buffer);
@@ -85,12 +85,12 @@ public class FileSystem {
 		int buffer_index = 0;
 		
 		while (offset < ftEnt.inode.length && buffer_index < buffer.length) {
-			if (offset % Disk.blockSize == 0) {
+			if (offset % Disk.blockSize == 0) {  // Possible Source of OBOB!!!!
 				block = ftEnt.inode.findTargetBlock(offset);
 				SysLib.rawread(block, block_buffer);
 			}
 			
-			buffer[buffer_index] = block_buffer[offset];
+			buffer[buffer_index] = block_buffer[offset % Disk.blockSize];
 			
 			offset++;
 			buffer_index++;
@@ -103,6 +103,39 @@ public class FileSystem {
 		// Read in the appropriate blocks
 		// Write the contents of buffer to the file specified by ftEnt
 		// 
+		// Check write permissions.
+		
+		int offset = ftEnt.seekPtr;
+		int block;
+		byte[] block_buffer = new byte[Disk.blockSize];
+		
+		// Want to read in the first block only if we actually have a file...
+		if (ftEnt.inode.length > 0) {
+			block = ftEnt.inode.findTargetBlock(offset);
+			SysLib.rawread(block, block_buffer);
+		}
+		
+		int buffer_index = 0;
+		
+		while (buffer_index < buffer.length) {
+
+			if (offset % Disk.blockSize == 0) {
+				if (offset >= ftEnt.inode.length) {
+					// grab a new block from freelist
+					// "read" that block into the buffer
+					int 
+				}
+				// get next block number 
+				// read in that block to buffer
+			}
+			
+			block_buffer[offset % Disk.blockSize] = block[buffer_index];
+			
+			offset++;
+			buffer_index++;
+		}
+		
+		// Update inodes
 	}
 	
 
