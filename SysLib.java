@@ -32,7 +32,7 @@ public class SysLib {
     }
 
     public static int seek( FileTableEntry ftEnt, int offset, int whence ){
-        Vector args = new Vector<Object>;
+        Vector args = new Vector();
         args.add(ftEnt);        
         args.add(new Integer(offset));
         args.add(new Integer(whence));
