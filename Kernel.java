@@ -217,7 +217,7 @@ public class Kernel
 	
 	    case SEEK:
 	    if ( ( myTcb = scheduler.getMyTcb() ) != null ){
-	    	FileTableEntry ftEnt = filesystem.seek( args.get(0), args.get(1), args.get(2) );
+	    	FileTableEntry ftEnt = filesystem.seek( args.elementAt(0), args.elementAt(1), args.elementAt(2) );
 	    	if ( ftEnt == null ) {
 	    		return -1;
 	    	}
